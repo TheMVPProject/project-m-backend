@@ -23,6 +23,17 @@ func NewCreateUserUseCase(userRepo ports.UserRepository, factory *userDomain.Use
 }
 
 func(uc *CreatUserUseCase) Execute(ctx context.Context, firstName, lastName, email, password string, position user.UserType) *apperrors.AppError{
+	// Check if user with this email already exists
+	existingUser, appErr := uc.userRepo.GetUserByEmail(ctx, email)
+	if appErr != nil {
+		if appErr.Code != apperrors.CodeNotFound {
+			return appErr
+		}
+	}
+	if existingUser != nil {
+		return apperrors.NewConflict(nil, "User with this email already exists")
+	}
+
 	newUser, err := uc.factory.CreateUser(0, firstName, lastName, email, password, position)
 	if err != nil{
 		return apperrors.NewInternal(err, "faild to create user entity")
@@ -30,9 +41,10 @@ func(uc *CreatUserUseCase) Execute(ctx context.Context, firstName, lastName, ema
 
 	appUserToCreate := appModel.FromDomainUser(newUser)
 
-	_, appErr := uc.userRepo.CreateUser(ctx, appUserToCreate)
-	if appErr != nil{
-		return appErr
+	appError := uc.userRepo.CreateUser(ctx, appUserToCreate)
+	
+	if appError != nil{
+		return appError
 	}
 	return nil
 }

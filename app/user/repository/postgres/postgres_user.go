@@ -7,6 +7,7 @@ import (
 	"fmt"
 	appModel "project_m_backend/app/user/model"
 	"project_m_backend/apperrors"
+	"project_m_backend/domain/user"
 	"time"
 
 	"github.com/lib/pq"
@@ -17,6 +18,7 @@ const(
 	RETURNING id;`
 	queryGetUserByID = `SELECT id, first_name, last_name, email, password_hash, position, created_at FROM users WHERE id =$1;`
 	queryGetUserByEmail = `SELECT id, first_name, last_name, email, password_hash, position, created_at FROM users WHERE email = $1;`
+	queryGetEmployeeList = `Select id, first_name, last_name, email, position, created_at FROM users WHERE position = $1;`
 )
 
 type PostgresUserRepository struct{
@@ -24,6 +26,7 @@ type PostgresUserRepository struct{
 	createUserStmt *sql.Stmt
 	getUserByIDStmt *sql.Stmt
 	getUserByEmail *sql.Stmt
+	getEmployeeList *sql.Stmt
 }
 
 func NewPostgresUserRepository(db *sql.DB) (*PostgresUserRepository, error){
@@ -40,11 +43,17 @@ func NewPostgresUserRepository(db *sql.DB) (*PostgresUserRepository, error){
 		return nil, apperrors.NewInternal(err, "error preparing get user by email")
 	}
 
+	qetEmployeeListStmt, err := db.PrepareContext(context.Background(), queryGetEmployeeList)
+	if err != nil{
+		return nil, apperrors.NewInternal(err, "error preparing get employee list")
+	}
+
 	return &PostgresUserRepository{
 		db: db,
 		createUserStmt: createUserStmt,
 		getUserByIDStmt: getUserByIDStmt,
 		getUserByEmail: getUserByEmailStmt,
+		getEmployeeList: qetEmployeeListStmt,
 	}, nil
 }
 
@@ -60,6 +69,9 @@ func (r *PostgresUserRepository) Close() error{
 	if err := r.getUserByEmail.Close(); err != nil{
 		errs = append(errs, err)
 	}
+	if err := r.getEmployeeList.Close(); err != nil{
+		errs = append(errs, err)
+	}
 	if len(errs) > 0{
 		return apperrors.NewInternal(fmt.Errorf("multiple errors: %v", errs), "errors closing statements")
 	}
@@ -67,7 +79,7 @@ func (r *PostgresUserRepository) Close() error{
 }
 
 //create user
-func (r *PostgresUserRepository) CreateUser(ctx context.Context, user *appModel.AppUser) (int64, *apperrors.AppError){
+func (r *PostgresUserRepository) CreateUser(ctx context.Context, user *appModel.AppUser) *apperrors.AppError{
 	createdAt := time.Now()
 	
 	var id int64
@@ -77,11 +89,11 @@ func (r *PostgresUserRepository) CreateUser(ctx context.Context, user *appModel.
 
 	if err != nil{
 		if pgErr, ok := err.(*pq.Error); ok && pgErr.Code == "23505"{
-			return 0, apperrors.NewInvalidInput(err, apperrors.CodeConflict, "A user with this email alradyy Exist")
+			return apperrors.NewInvalidInput(err, apperrors.CodeConflict, "A user with this email alrady Exist")
 		}
-		return 0, apperrors.NewInternal(err, "faild to create user")
+		return apperrors.NewInternal(err, "faild to create user")
 	}
-	return id,nil
+	return nil
 }
 
 
@@ -115,4 +127,38 @@ func (r *PostgresUserRepository) GetUserByEmail(ctx context.Context, email strin
 		return nil, apperrors.NewInternal(err, "faild to get user by email")
 	}
 	return appUser, nil
+}
+
+func (r *PostgresUserRepository) GetEmployeesList(ctx context.Context) ([]*appModel.AppUser, *apperrors.AppError){
+	rows, err := r.getEmployeeList.QueryContext(ctx, user.UserEmployee)
+	if err != nil{
+		return nil, apperrors.NewInternal(err, "faild to query employee list")
+	}
+	defer rows.Close()
+
+	var employee []*appModel.AppUser
+
+	for rows.Next(){
+		user := &appModel.AppUser{}
+
+		err := rows.Scan(
+			&user.ID,
+			&user.FirstName,
+			&user.LastName,
+			&user.Email,
+			&user.Position,
+			&user.CreatedAt,
+		)
+		if err != nil{
+			return nil, apperrors.NewInternal(err, "faild to scan employee")
+		}
+
+		employee = append(employee, user)
+	}
+
+	if err := rows.Err(); err != nil{
+		return nil, apperrors.NewInternal(err, "row iteration error")
+	}
+
+	return employee, nil
 }

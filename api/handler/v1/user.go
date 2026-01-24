@@ -1,13 +1,15 @@
 package v1
 
 import (
+	appModel "project_m_backend/app/user/model"
 	"project_m_backend/app/user/usecase"
+	"project_m_backend/apperrors"
+	"project_m_backend/domain/user"
 	"project_m_backend/pkg/auth/jwt"
 	"strconv"
 	"time"
+
 	"github.com/gofiber/fiber/v2"
-	appModel "project_m_backend/app/user/model"
-	"project_m_backend/domain/user"
 )
 
 
@@ -15,6 +17,7 @@ type UserHandler struct{
 	createUserUserCase *usecase.CreatUserUseCase
 	getUserByIdUserCase *usecase.GetUserByIdUseCase
 	loginWithEmailUserCase *usecase.LoginWithEmailUseCase
+	getEmployeeListUseCase *usecase.GetEmployeesListUseCase
 	jwtService *jwt.JWTService
 	accessTokenExpiry time.Duration
 	refreshTokenExpiry time.Duration
@@ -24,6 +27,7 @@ func NewUserHandler(
 	createUserUserCase *usecase.CreatUserUseCase,
 	getUserByIdUseCase *usecase.GetUserByIdUseCase,
 	loginWithEmailUseCase *usecase.LoginWithEmailUseCase,
+	getEmployeeListUseCase *usecase.GetEmployeesListUseCase,
 	jwtService *jwt.JWTService,
 	accessTokenExpiry time.Duration,
 	refreshTokenExpiry time.Duration,
@@ -32,6 +36,7 @@ func NewUserHandler(
 		createUserUserCase: createUserUserCase,
 		getUserByIdUserCase: getUserByIdUseCase,
 		loginWithEmailUserCase: loginWithEmailUseCase,
+		getEmployeeListUseCase: getEmployeeListUseCase,
 		jwtService: jwtService,
 		accessTokenExpiry: accessTokenExpiry,
 		refreshTokenExpiry: refreshTokenExpiry,
@@ -157,4 +162,32 @@ func (h *UserHandler) LoginWithEmail(c *fiber.Ctx) error{
 			Position: loggedInUser.Position,
 		},
 	)
+}
+
+
+func (h *UserHandler) GetEmployeeList(c *fiber.Ctx) error{
+	userId, ok := c.Locals("user_id").(int64)
+	if !ok{
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "User Unautherized"})
+	}
+
+	authenticatedUser, appErr := h.getUserByIdUserCase.Execute(c.Context(), userId)
+	if appErr != nil{
+		return c.Status(appErr.Code.HTTPStatus()).JSON(fiber.Map{
+			"error": appErr.Message})
+	}
+
+	if authenticatedUser.Position == user.UserEmployee{
+		return c.Status(apperrors.CodeUnauthorized.HTTPStatus()).JSON(fiber.Map{
+			"error": "User Not Autherized"})
+	}
+
+	employees, appErr := h.getEmployeeListUseCase.Execute(c.Context())
+	if appErr != nil{
+		return c.Status(appErr.Code.HTTPStatus()).JSON(fiber.Map{
+			"error": appErr.Message})
+	}
+
+	return c.JSON(employees)
 }
