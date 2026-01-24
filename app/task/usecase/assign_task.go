@@ -2,11 +2,11 @@ package usecase
 
 import (
 	"context"
-	"project_m_backend/app/task/ports"
-	"project_m_backend/apperrors"
-	"project_m_backend/domain/task"
+	"assignly/app/task/ports"
+	"assignly/apperrors"
+	"assignly/domain/task"
 	"time"
-	appModel "project_m_backend/app/task/model"
+	appModel "assignly/app/task/model"
 )
 
 type AssigneTaskUseCase struct{

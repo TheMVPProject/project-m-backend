@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"context"
-	appModel "project_m_backend/app/user/model"
-	"project_m_backend/app/user/ports"
-	"project_m_backend/apperrors"
+	appModel "assignly/app/user/model"
+	"assignly/app/user/ports"
+	"assignly/apperrors"
 )
 
 type GetEmployeesListUseCase struct{

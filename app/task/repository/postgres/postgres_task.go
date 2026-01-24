@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	appModel "project_m_backend/app/task/model"
-	"project_m_backend/apperrors"
+	appModel "assignly/app/task/model"
+	"assignly/apperrors"
 	"time"
 )
 

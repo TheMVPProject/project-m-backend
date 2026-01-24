@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"project_m_backend/app/task/ports"
-	"project_m_backend/apperrors"
+	"assignly/app/task/ports"
+	"assignly/apperrors"
 )
 
 type DeleteTaskUseCase struct {

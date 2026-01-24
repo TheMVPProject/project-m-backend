@@ -1,7 +1,7 @@
 package model
 
 import (
-	"project_m_backend/domain/task"
+	"assignly/domain/task"
 	"time"
 )
 

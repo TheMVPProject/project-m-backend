@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"fmt"
-	"project_m_backend/pkg/auth/jwt"
+	"assignly/pkg/auth/jwt"
 
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"

@@ -3,10 +3,10 @@ package v1
 import (
 	"strconv"
 
-	"project_m_backend/app/task/usecase"
-	userUseCase "project_m_backend/app/user/usecase"
-	"project_m_backend/domain/task"
-	"project_m_backend/domain/user"
+	"assignly/app/task/usecase"
+	userUseCase "assignly/app/user/usecase"
+	"assignly/domain/task"
+	"assignly/domain/user"
 	"time"
 
 	"github.com/gofiber/fiber/v2"

@@ -1,4 +1,4 @@
-module project_m_backend
+module assignly
 
 go 1.25.6
 

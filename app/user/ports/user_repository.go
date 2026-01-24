@@ -2,8 +2,8 @@ package ports
 
 import (
 	"context"
-	appModel "project_m_backend/app/user/model"
-	"project_m_backend/apperrors"
+	appModel "assignly/app/user/model"
+	"assignly/apperrors"
 )
 
 type UserRepository interface{

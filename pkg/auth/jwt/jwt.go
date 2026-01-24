@@ -2,8 +2,8 @@ package jwt
 
 import (
 	"fmt"
-	"project_m_backend/domain/user"
-	"project_m_backend/pkg/crypto"
+	"assignly/domain/user"
+	"assignly/pkg/crypto"
 	"strconv"
 	"time"
 

@@ -2,7 +2,7 @@ package model
 
 import (
 	"time"
-	"project_m_backend/domain/user"
+	"assignly/domain/user"
 )
 
 type AppUser struct{

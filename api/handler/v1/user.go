@@ -1,11 +1,11 @@
 package v1
 
 import (
-	appModel "project_m_backend/app/user/model"
-	"project_m_backend/app/user/usecase"
-	"project_m_backend/apperrors"
-	"project_m_backend/domain/user"
-	"project_m_backend/pkg/auth/jwt"
+	appModel "assignly/app/user/model"
+	"assignly/app/user/usecase"
+	"assignly/apperrors"
+	"assignly/domain/user"
+	"assignly/pkg/auth/jwt"
 	"strconv"
 	"time"
 

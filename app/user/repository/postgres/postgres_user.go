@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	appModel "project_m_backend/app/user/model"
-	"project_m_backend/apperrors"
-	"project_m_backend/domain/user"
+	appModel "assignly/app/user/model"
+	"assignly/apperrors"
+	"assignly/domain/user"
 	"time"
 
 	"github.com/lib/pq"

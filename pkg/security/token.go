@@ -3,7 +3,7 @@ package security
 import (
 	"fmt"
 	"math/rand"
-	"project_m_backend/apperrors"
+	"assignly/apperrors"
 	"strconv"
 	"time"
 )

@@ -2,11 +2,11 @@ package usecase
 
 import (
 	"context"
-	appModel "project_m_backend/app/user/model"
-	"project_m_backend/app/user/ports"
-	"project_m_backend/apperrors"
-	"project_m_backend/domain/user"
-	userDomain "project_m_backend/domain/user"
+	appModel "assignly/app/user/model"
+	"assignly/app/user/ports"
+	"assignly/apperrors"
+	"assignly/domain/user"
+	userDomain "assignly/domain/user"
 )
 
 
