@@ -92,6 +92,7 @@ func main(){
 	users := app.Group("/users")
 	users.Post("/create", userHandler.CreateUser)
 	users.Post("/login", userHandler.LoginWithEmail)
+	users.Post("/refresh-token", userHandler.RefreshToken)
 	users.Get("/get", userHandler.GetUserById)
 	users.Get("/employees-list", authMiddleWare, userHandler.GetEmployeeList)
 
@@ -100,6 +101,7 @@ func main(){
 	tasks.Get("/get-assigned-task", authMiddleWare, taskHandler.GetAssignedTasksByEmployeeId)
 	tasks.Put("/status/:taskId", authMiddleWare, taskHandler.UpdateTaskStatus)
 	tasks.Delete("/delete/:taskId", authMiddleWare, taskHandler.DeleteTask)
+
 	fmt.Println("Server listening on port 8080")
 	log.Fatal(app.Listen(":8080"))
 }

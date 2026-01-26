@@ -165,6 +165,60 @@ func (h *UserHandler) LoginWithEmail(c *fiber.Ctx) error{
 }
 
 
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
+type RefreshTokenResponse struct {
+	AccessToken        string    `json:"access_token"`
+	AccessTokenExpiry  time.Time `json:"access_token_expiry"`
+	RefreshToken       string    `json:"refresh_token"`
+	RefreshTokenExpiry time.Time `json:"refresh_token_expiry"`
+}
+
+func (h *UserHandler) RefreshToken(c *fiber.Ctx) error {
+	var req RefreshTokenRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if req.RefreshToken == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Refresh token is required"})
+	}
+
+	userID, err := h.jwtService.ParseRefreshToken(req.RefreshToken)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired refresh token"})
+	}
+
+	user, appErr := h.getUserByIdUserCase.Execute(c.Context(), userID)
+	if appErr != nil {
+		return c.Status(appErr.Code.HTTPStatus()).JSON(fiber.Map{"error": appErr.Message})
+	}
+
+	domainUser := appModel.ToDomainUser(user)
+
+	accessToken, err := h.jwtService.GenerateAccessToken(domainUser, h.accessTokenExpiry)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to generate access token"})
+	}
+
+	refreshToken, err := h.jwtService.GenerateRefreshToken(domainUser, h.refreshTokenExpiry)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to generate refresh token"})
+	}
+
+	accessTokenExpiryTime := time.Now().Add(h.accessTokenExpiry)
+	refreshTokenExpiryTime := time.Now().Add(h.refreshTokenExpiry)
+
+	return c.JSON(RefreshTokenResponse{
+		AccessToken:        accessToken,
+		AccessTokenExpiry:  accessTokenExpiryTime,
+		RefreshToken:       refreshToken,
+		RefreshTokenExpiry: refreshTokenExpiryTime,
+	})
+}
+
 func (h *UserHandler) GetEmployeeList(c *fiber.Ctx) error{
 	userId, ok := c.Locals("user_id").(int64)
 	if !ok{

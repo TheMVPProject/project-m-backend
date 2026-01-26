@@ -26,7 +26,7 @@ func (tc *UpdateTaskStatusUseCase) Execute(ctx context.Context, taskId int64, us
 	if existingTask.AssignedTo != userId && existingTask.AssignedBy != userId {
 		return apperrors.NewUnauthorized(nil, "you are not authorized to update this task status")
 	}
-
+	println("now updating task status")
 	appErr = tc.taskRepo.UpdateTaskStatus(ctx, taskId, string(status))
 	if appErr != nil {
 		return appErr

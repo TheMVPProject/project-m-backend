@@ -3,6 +3,7 @@ package v1
 import (
 	"strconv"
 
+	"assignly/app/task/model"
 	"assignly/app/task/usecase"
 	userUseCase "assignly/app/user/usecase"
 	"assignly/domain/task"
@@ -99,7 +100,13 @@ func (h *TaskHandler) GetAssignedTasksByEmployeeId(c *fiber.Ctx) error{
 		return c.Status((appErr.Code.HTTPStatus())).JSON(fiber.Map{"error": appErr.Message})
 	}
 
-	return c.JSON(tasks)
+	if tasks == nil{
+		tasks = []*model.AppTask{}
+	}
+
+	return c.JSON(fiber.Map{
+		"tasks": tasks,
+	})
 }
 
 type UpdateTaskStatusRequest struct{
@@ -122,7 +129,7 @@ func (h *TaskHandler) UpdateTaskStatus(c *fiber.Ctx) error{
 	if err != nil{
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid task id"})
 	}
-
+	println(taskId)
 	appErr := h.updateTaskStatus.Execute(c.Context(), taskId, userId, req.Status)
 	if appErr != nil{
 		return c.Status(appErr.Code.HTTPStatus()).JSON(fiber.Map{"error": appErr.Message})
@@ -152,7 +159,6 @@ func (h *TaskHandler) DeleteTask(c *fiber.Ctx) error{
 	if err != nil{
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid task id"})
 	}
-
 	appErr = h.deleteTask.Execute(c.Context(), taskId, userId)
 	if appErr != nil{
 		return c.Status(appErr.Code.HTTPStatus()).JSON(fiber.Map{"error": appErr.Message})

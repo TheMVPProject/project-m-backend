@@ -36,7 +36,7 @@ func(uc *CreatUserUseCase) Execute(ctx context.Context, firstName, lastName, ema
 
 	newUser, err := uc.factory.CreateUser(0, firstName, lastName, email, password, position)
 	if err != nil{
-		return apperrors.NewInternal(err, "faild to create user entity")
+		return apperrors.NewInvalidInput(err, apperrors.CodeInvalideInput, err.Error())
 	}
 
 	appUserToCreate := appModel.FromDomainUser(newUser)
