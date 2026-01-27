@@ -1,9 +1,7 @@
 package middleware
 
 import (
-	"fmt"
 	"assignly/pkg/auth/jwt"
-
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	golangJwt "github.com/golang-jwt/jwt/v5"
@@ -31,7 +29,6 @@ func NewAuthMiddleware(jwtService *jwt.JWTService) fiber.Handler{
 			return c.Next()
 		},
 		ErrorHandler: func (c *fiber.Ctx, err error)  error{
-			fmt.Println("JWT error:", err)
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired access token"})
 		},
 	

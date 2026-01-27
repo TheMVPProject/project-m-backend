@@ -15,7 +15,7 @@ func NewGetEmployeeListUseCase(userRepo ports.UserRepository) *GetEmployeesListU
 	return &GetEmployeesListUseCase{userRepo: userRepo,}
 }
 
-func (uc *GetEmployeesListUseCase)Execute(ctx context.Context) ([]*appModel.AppUser, *apperrors.AppError){
+func (uc *GetEmployeesListUseCase)Execute(ctx context.Context) ([]*appModel.EmployeeUser, *apperrors.AppError){
 	employees, apperr := uc.userRepo.GetEmployeesList(ctx)
 	if apperr != nil{
 		return nil, apperr

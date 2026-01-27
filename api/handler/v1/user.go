@@ -243,5 +243,7 @@ func (h *UserHandler) GetEmployeeList(c *fiber.Ctx) error{
 			"error": appErr.Message})
 	}
 
-	return c.JSON(employees)
+	return c.JSON(fiber.Map{
+		"employees": employees,
+	})
 }

@@ -158,7 +158,6 @@ func (r *PostgresTaskRepository) GetAssignedTaskByUserId(ctx context.Context, us
 			&task.UpdatedAt,
 		)
 		if err != nil {
-			fmt.Println(err.Error())
 			return nil, apperrors.NewInternal(
 				err, "faild to scan tasks")
 		}

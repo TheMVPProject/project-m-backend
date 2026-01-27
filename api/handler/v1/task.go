@@ -79,7 +79,7 @@ func (h *TaskHandler) AssignTaskToEmployee(c *fiber.Ctx) error{
 	if err != nil{
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Faild to Assign a task"})
 	}
-	return c.JSON(fiber.StatusCreated)
+	return c.JSON(fiber.Map{"status":"success"})
 }
 
 
@@ -129,13 +129,12 @@ func (h *TaskHandler) UpdateTaskStatus(c *fiber.Ctx) error{
 	if err != nil{
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid task id"})
 	}
-	println(taskId)
 	appErr := h.updateTaskStatus.Execute(c.Context(), taskId, userId, req.Status)
 	if appErr != nil{
 		return c.Status(appErr.Code.HTTPStatus()).JSON(fiber.Map{"error": appErr.Message})
 	}
 
-	return c.JSON(fiber.Map{"message": "task status updated"})
+	return c.JSON(fiber.Map{"status": "success"})
 }
 
 func (h *TaskHandler) DeleteTask(c *fiber.Ctx) error{
@@ -164,5 +163,5 @@ func (h *TaskHandler) DeleteTask(c *fiber.Ctx) error{
 		return c.Status(appErr.Code.HTTPStatus()).JSON(fiber.Map{"error": appErr.Message})
 	}
 
-	return c.JSON(fiber.Map{"message": "task deleted successfully"})
+	return c.JSON(fiber.Map{"status": "success"})
 }

@@ -15,3 +15,8 @@ type AppUser struct{
 	CreatedAt time.Time
 	LastSignIn time.Time
 }
+
+type EmployeeUser struct{
+	ID int64
+	Name string
+}

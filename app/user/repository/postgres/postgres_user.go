@@ -18,7 +18,7 @@ const(
 	RETURNING id;`
 	queryGetUserByID = `SELECT id, first_name, last_name, email, password_hash, position, created_at FROM users WHERE id =$1;`
 	queryGetUserByEmail = `SELECT id, first_name, last_name, email, password_hash, position, created_at FROM users WHERE email = $1;`
-	queryGetEmployeeList = `Select id, first_name, last_name, email, position, created_at FROM users WHERE position = $1;`
+	queryGetEmployeeList = `Select id, first_name, last_name FROM users WHERE position = $1;`
 )
 
 type PostgresUserRepository struct{
@@ -129,14 +129,14 @@ func (r *PostgresUserRepository) GetUserByEmail(ctx context.Context, email strin
 	return appUser, nil
 }
 
-func (r *PostgresUserRepository) GetEmployeesList(ctx context.Context) ([]*appModel.AppUser, *apperrors.AppError){
+func (r *PostgresUserRepository) GetEmployeesList(ctx context.Context) ([]*appModel.EmployeeUser, *apperrors.AppError){
 	rows, err := r.getEmployeeList.QueryContext(ctx, user.UserEmployee)
 	if err != nil{
 		return nil, apperrors.NewInternal(err, "faild to query employee list")
 	}
 	defer rows.Close()
 
-	var employee []*appModel.AppUser
+	var employees []*appModel.EmployeeUser
 
 	for rows.Next(){
 		user := &appModel.AppUser{}
@@ -145,20 +145,22 @@ func (r *PostgresUserRepository) GetEmployeesList(ctx context.Context) ([]*appMo
 			&user.ID,
 			&user.FirstName,
 			&user.LastName,
-			&user.Email,
-			&user.Position,
-			&user.CreatedAt,
 		)
 		if err != nil{
 			return nil, apperrors.NewInternal(err, "faild to scan employee")
 		}
 
-		employee = append(employee, user)
+		employee := &appModel.EmployeeUser{
+			ID : user.ID,
+			Name: user.FirstName+" "+user.LastName,
+		}
+
+		employees = append(employees, employee)
 	}
 
 	if err := rows.Err(); err != nil{
 		return nil, apperrors.NewInternal(err, "row iteration error")
 	}
 
-	return employee, nil
+	return employees, nil
 }
